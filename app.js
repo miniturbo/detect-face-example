@@ -21,39 +21,42 @@ const args = minimist(process.argv.slice(2), {
 const md5 = (str) => crypto.createHash('md5').update(str).digest('hex');
 
 const detect = function* (file) {
-  const ext  = path.extname(file);
-  const dir  = path.dirname(file);
-  const base = path.basename(file, ext);
+  try {
+    const ext  = path.extname(file);
+    const dir  = path.dirname(file);
+    const base = path.basename(file, ext);
 
-  const mat   = yield promisify(cv.readImage)(`${file}`);
-  const faces = yield promisify(mat.detectObject.bind(mat))(cv.FACE_CASCADE, {});
-  console.log(`-- ${file}`);
-  console.log(`faces:  ${faces.length}`);
+    const mat   = yield promisify(cv.readImage)(`${file}`);
+    const faces = yield promisify(mat.detectObject.bind(mat))(cv.FACE_CASCADE, {});
+    console.log(`-- ${file}`);
+    console.log(`faces:  ${faces.length}`);
 
-  yield faces.map(series(function* (face, i) {
-    const width  = Math.round(face.width * 1.2);
-    const height = Math.round(face.height * 1.2);
-    const x      = Math.round(face.x - ((width - face.width) / 2));
-    const y      = Math.round(face.y - ((height - face.height) / 2));
+    yield faces.map(series(function* (face, i) {
+      const width  = Math.round(face.width * 1.2);
+      const height = Math.round(face.height * 1.2);
+      const x      = Math.round(face.x - ((width - face.width) / 2));
+      const y      = Math.round(face.y - ((height - face.height) / 2));
 
-    console.log('info:  ', { width, height, x, y });
+      console.log('info:  ', { width, height, x, y });
 
-    const name = md5(`${dir}/${base}_${i}${ext}`);
-    const img  = gm(mat.toBuffer());
-    img.crop(width, height, x, y);
-    img.resize(IMG_WIDTH, IMG_HEIGHT);
+      const name = md5(`${dir}/${base}_${i}${ext}`);
+      const img  = gm(mat.toBuffer());
+      img.crop(width, height, x, y);
+      img.resize(IMG_WIDTH, IMG_HEIGHT);
 
-    yield promisify(img.write.bind(img))(`${args.output}/${name}${ext}`);
+      yield promisify(img.write.bind(img))(`${args.output}/${name}${ext}`);
 
-    console.log(`output: ${args.output}/${name}${ext}`);
-  }));
+      console.log(`output: ${args.output}/${name}${ext}`);
+    }));
+  } catch (ex) {
+    console.error(ex);
+  }
 };
 
 co(function* () {
   const files = yield promisify(glob)(`${args.input}/**/*`);
-
   yield files
     .filter(file => fs.statSync(file).isFile())
-    .filter(file => /.*\.jpg$/.test(file))
+    .filter(file => new RegExp('.*\.jpe?g$', 'i').test(file))
     .map(series(detect));
 }).catch(err => console.error(err));
