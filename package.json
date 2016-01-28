@@ -5,6 +5,9 @@
   "author": "miniturbo <kazuya.shono@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "co": "^4.6.0",
+    "co-series": "^2.0.0",
+    "es6-promisify": "^3.0.0",
     "glob": "^6.0.4",
     "gm": "^1.21.1",
     "minimist": "^1.2.0",
