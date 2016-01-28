@@ -30,7 +30,7 @@ const detect = function* (file) {
   console.log(`-- ${file}`);
   console.log(`faces:  ${faces.length}`);
 
-  faces.forEach(series(function* (face, i) {
+  yield faces.map(series(function* (face, i) {
     const width  = Math.round(face.width * 1.2);
     const height = Math.round(face.height * 1.2);
     const x      = Math.round(face.x - ((width - face.width) / 2));
@@ -52,8 +52,8 @@ const detect = function* (file) {
 co(function* () {
   const files = yield promisify(glob)(`${args.input}/**/*`);
 
-  yield* files
+  yield files
     .filter(file => fs.statSync(file).isFile())
     .filter(file => /.*\.jpg$/.test(file))
     .map(series(detect));
-});
+}).catch(err => console.error(err));
