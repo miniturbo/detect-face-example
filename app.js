@@ -42,7 +42,8 @@ const detect = function* (file) {
     const img  = gm(mat.toBuffer());
     img.crop(width, height, x, y);
     img.resize(IMG_WIDTH, IMG_HEIGHT);
-    img.write(`${args.output}/${name}${ext}`, (err) => {});
+
+    yield promisify(img.write.bind(img))(`${args.output}/${name}${ext}`);
 
     console.log(`output: ${args.output}/${name}${ext}`);
   }));
