@@ -1,0 +1,12 @@
+{
+  "name": "detect-face-example",
+  "version": "0.0.1",
+  "main": "app.js",
+  "author": "miniturbo <kazuya.shono@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "gm": "^1.21.1",
+    "minimist": "^1.2.0",
+    "opencv": "^4.0.0"
+  }
+}
