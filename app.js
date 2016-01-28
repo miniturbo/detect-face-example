@@ -26,7 +26,14 @@ const detect = function* (file) {
     const dir  = path.dirname(file);
     const base = path.basename(file, ext);
 
-    const mat   = yield promisify(cv.readImage)(`${file}`);
+    const img  = gm(fs.readFileSync(file));
+    const size = yield promisify(img.size.bind(img))();
+    if (size.width > 640) {
+      img.resize(640);
+    }
+
+    const buf   = yield promisify(img.toBuffer.bind(img))();
+    const mat   = yield promisify(cv.readImage)(buf);
     const faces = yield promisify(mat.detectObject.bind(mat))(cv.FACE_CASCADE, {});
     console.log(`-- ${file}`);
     console.log(`faces:  ${faces.length}`);
