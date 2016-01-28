@@ -5,6 +5,7 @@
   "author": "miniturbo <kazuya.shono@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "glob": "^6.0.4",
     "gm": "^1.21.1",
     "minimist": "^1.2.0",
     "opencv": "^4.0.0"
